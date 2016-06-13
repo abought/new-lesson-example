@@ -24,6 +24,7 @@ SOURCE_DIRS = ['', '_episodes', '_extras']
 # The '%' is replaced with the source directory path for checking.
 # Episodes are handled specially, and extra files in '_extras' are also handled specially.
 # This list must include all the Markdown files listed in the 'bin/initialize' script.
+# TODO: Identify the meaning of the first element in the tuple and implement as needed
 REQUIRED_FILES = [
     (True, '%/CONDUCT.md'),
     (False, '%/CONTRIBUTING.md'),
@@ -76,7 +77,7 @@ def main():
     args.reporter = Reporter(args)
     check_config(args)
     docs = read_all_markdown(args, args.source_dir)
-    check_fileset(args, docs)
+    check_fileset(args.source_dir, args.reporter, docs.keys())
     for filename in docs.keys():
         checker = create_checker(args, filename, docs[filename])
         checker.check()
@@ -156,15 +157,15 @@ def read_markdown(args, path):
     }
 
 
-def check_fileset(args, docs):
+def check_fileset(source_dir, reporter, filenames):
     """Are all required files present? Are extraneous files present?"""
 
     # Check files with predictable names.
-    actual = docs.keys()
-    required = [p[1].replace('%', args.source_dir) for p in REQUIRED_FILES]
+    actual = filenames
+    required = [p[1].replace('%', source_dir) for p in REQUIRED_FILES]
     missing = set(required) - set(actual)
     for m in missing:
-        args.reporter.add(None, 'Missing required file {0}', m)
+        reporter.add(None, 'Missing required file {0}', m)
 
     # Check episode files' names.
     seen = []
@@ -175,16 +176,17 @@ def check_fileset(args, docs):
         if m and m.group(1):
             seen.append(m.group(1))
         else:
-            args.reporter.add(None, 'Episode {0} has badly-formatted filename', e)
+            # FIXME: Undefined variable; check intent and fix error @gvwilson
+            reporter.add(None, 'Episode {0} has badly-formatted filename', e)
 
     # Check episode filename numbering.
-    args.reporter.check(len(seen) == len(set(seen)),
+    reporter.check(len(seen) == len(set(seen)),
                         None,
                         'Duplicate episode numbers {0} vs {1}',
                         sorted(seen), sorted(set(seen)))
     seen = [int(s) for s in seen]
     seen.sort()
-    args.reporter.check(all([i+1 == n for (i, n) in enumerate(seen)]),
+    reporter.check(all([i+1 == n for (i, n) in enumerate(seen)]),
                         None,
                         'Missing or non-consecutive episode numbers {0}',
                         seen)

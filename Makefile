@@ -69,6 +69,9 @@ HTML_FILES = \
 lesson-check :
 	bin/lesson_check.py -s . -p bin/markdown-ast.rb
 
+unittest :
+	python bin/test_lesson_check.py
+
 ## lesson-files   : show expected names of generated files for debugging.
 lesson-files :
 	@echo 'source:' ${SRC_FILES}
