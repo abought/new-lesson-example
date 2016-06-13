@@ -13,6 +13,7 @@ from collections import Counter
 
 __version__ = '0.6'
 
+
 # basic logging configuration
 logger = logging.getLogger(__name__)
 verbosity = logging.INFO  # severity of at least INFO will emerge
@@ -25,6 +26,7 @@ console_handler.setLevel(verbosity)
 formatter = logging.Formatter('%(levelname)s: %(message)s')
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
+
 
 # TODO: these regexp patterns need comments inside
 EMAIL_PATTERN = r'[^@]+@[^@]+\.[^@]+'
@@ -95,14 +97,12 @@ def add_suberror(msg, errors):
 
 def look_for_fixme(func):
     '''Decorator to fail test if text argument starts with "FIXME".'''
-
     def inner(arg):
         if (arg is not None) and \
-                isinstance(arg, str) and \
-                arg.lstrip().startswith('FIXME'):
+           isinstance(arg, str) and \
+           arg.lstrip().startswith('FIXME'):
             return False
         return func(arg)
-
     return inner
 
 
@@ -242,47 +242,47 @@ def check_pass(value):
 
 
 HANDLERS = {
-    'layout': (True, check_layout, 'layout isn\'t "workshop"'),
+    'layout':     (True, check_layout, 'layout isn\'t "workshop"'),
 
-    'country': (True, check_country,
-                'country invalid: must use lowercase two-letter ISO code ' +
-                'from ' + ', '.join(ISO_COUNTRY)),
-    'language': (False, check_language,
-                 'language invalid: must use lowercase two-letter ISO code' +
-                 ' from ' + ', '.join(ISO_LANGUAGE)),
+    'country':    (True, check_country,
+                   'country invalid: must use lowercase two-letter ISO code ' +
+                   'from ' + ', '.join(ISO_COUNTRY)),
+    'language':   (False,  check_language,
+                   'language invalid: must use lowercase two-letter ISO code' +
+                   ' from ' + ', '.join(ISO_LANGUAGE)),
 
-    'humandate': (True, check_humandate,
-                  'humandate invalid. Please use three-letter months like ' +
-                  '"Jan" and four-letter years like "2025".'),
-    'humantime': (True, check_humantime,
-                  'humantime doesn\'t include numbers'),
-    'startdate': (True, check_date,
-                  'startdate invalid. Must be of format year-month-day, ' +
-                  'i.e., 2014-01-31.'),
-    'enddate': (False, check_date,
-                'enddate invalid. Must be of format year-month-day, i.e.,' +
-                ' 2014-01-31.'),
+    'humandate':  (True, check_humandate,
+                   'humandate invalid. Please use three-letter months like ' +
+                   '"Jan" and four-letter years like "2025".'),
+    'humantime':  (True, check_humantime,
+                   'humantime doesn\'t include numbers'),
+    'startdate':  (True, check_date,
+                   'startdate invalid. Must be of format year-month-day, ' +
+                   'i.e., 2014-01-31.'),
+    'enddate':    (False, check_date,
+                   'enddate invalid. Must be of format year-month-day, i.e.,' +
+                   ' 2014-01-31.'),
 
-    'latlng': (True, check_latitude_longitude,
-               'latlng invalid. Check that it is two floating point ' +
-               'numbers, separated by a comma.'),
+    'latlng':     (True, check_latitude_longitude,
+                   'latlng invalid. Check that it is two floating point ' +
+                   'numbers, separated by a comma.'),
 
     'instructor': (True, check_instructors,
                    'instructor list isn\'t a valid list of format ' +
                    '["First instructor", "Second instructor",..].'),
-    'helper': (True, check_helpers,
-               'helper list isn\'t a valid list of format ' +
-               '["First helper", "Second helper",..].'),
+    'helper':     (True, check_helpers,
+                   'helper list isn\'t a valid list of format ' +
+                   '["First helper", "Second helper",..].'),
 
-    'contact': (True, check_email,
-                'contact email invalid or still set to ' +
-                '"{0}".'.format(DEFAULT_CONTACT_EMAIL)),
+    'contact':    (True, check_email,
+                   'contact email invalid or still set to ' +
+                   '"{0}".'.format(DEFAULT_CONTACT_EMAIL)),
 
     'eventbrite': (False, check_eventbrite, 'Eventbrite key appears invalid.'),
-    'etherpad': (False, check_etherpad, 'Etherpad URL appears invalid.'),
+    'etherpad':   (False, check_etherpad, 'Etherpad URL appears invalid.'),
 
-    'venue': (False, check_pass, 'venue name not specified'),
-    'address': (False, check_pass, 'address not specified')
+    'venue':      (False, check_pass, 'venue name not specified'),
+    'address':    (False, check_pass, 'address not specified')
 }
 
 # REQUIRED is all required categories.
@@ -306,8 +306,7 @@ def check_blank_lines(raw_data, errors, error_msg):
     lines = [x.strip() for x in raw_data.split('\n')]
     if '' in lines:
         add_error(error_msg, errors)
-        add_suberror('{0} blank lines found in header'.format(lines.count('')),
-                     errors)
+        add_suberror('{0} blank lines found in header'.format(lines.count('')), errors)
         return False
     return True
 
@@ -387,8 +386,7 @@ def check_config(filename, errors):
         config = yaml.load(reader)
 
     if config['kind'] != 'workshop':
-        msg = 'Not configured as a workshop: found "{0}" instead'.format(
-            config['kind'])
+        msg = 'Not configured as a workshop: found "{0}" instead'.format(config['kind'])
         add_error(msg, errors)
 
 
