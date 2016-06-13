@@ -20,11 +20,12 @@ __version__ = '0.2'
 # Where to look for source Markdown files.
 SOURCE_DIRS = ['', '_episodes', '_extras']
 
-# Required files (YAML_required, path).
+# Required files: each item is a tuple of (YAML_required, path).
+# TODO: We do not yet validate whether any files have the required
+#   YAML headers, but should in the future.
 # The '%' is replaced with the source directory path for checking.
 # Episodes are handled specially, and extra files in '_extras' are also handled specially.
 # This list must include all the Markdown files listed in the 'bin/initialize' script.
-# TODO: Identify the meaning of the first element in the tuple and implement as needed
 REQUIRED_FILES = [
     (True, '%/CONDUCT.md'),
     (False, '%/CONTRIBUTING.md'),
@@ -157,27 +158,26 @@ def read_markdown(args, path):
     }
 
 
-def check_fileset(source_dir, reporter, filenames):
+def check_fileset(source_dir, reporter, filenames_present):
     """Are all required files present? Are extraneous files present?"""
 
     # Check files with predictable names.
-    actual = filenames
+
     required = [p[1].replace('%', source_dir) for p in REQUIRED_FILES]
-    missing = set(required) - set(actual)
+    missing = set(required) - set(filenames_present)
     for m in missing:
         reporter.add(None, 'Missing required file {0}', m)
 
     # Check episode files' names.
     seen = []
-    for filename in actual:
+    for filename in filenames_present:
         if '_episodes' not in filename:
             continue
         m = P_EPISODE_FILENAME.search(filename)
         if m and m.group(1):
             seen.append(m.group(1))
         else:
-            # FIXME: Undefined variable; check intent and fix error @gvwilson
-            reporter.add(None, 'Episode {0} has badly-formatted filename', e)
+            reporter.add(None, 'Episode {0} has badly-formatted filename', filename)
 
     # Check episode filename numbering.
     reporter.check(len(seen) == len(set(seen)),
