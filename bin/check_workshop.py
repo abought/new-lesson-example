@@ -36,7 +36,7 @@ URL_PATTERN = r'https?://.+'
 
 DEFAULT_CONTACT_EMAIL = 'admin@software-carpentry.org'
 
-USAGE = 'Usage: "check-workshop path/to/index.html"\n'
+USAGE = 'Usage: "check_workshop path/to/index.html"\n'
 
 # Country and language codes.  Note that codes mean different things: 'ar'
 # is 'Arabic' as a language but 'Argentina' as a country.
