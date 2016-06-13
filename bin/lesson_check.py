@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-'''
+"""
 Check lesson files and their contents.
-'''
+"""
 
 import sys
 import os
@@ -70,7 +70,7 @@ EPISODE_METADATA_FIELDS = {
 }
 
 def main():
-    '''Main driver.'''
+    """Main driver."""
 
     args = parse_args()
     args.reporter = Reporter(args)
@@ -84,7 +84,7 @@ def main():
 
 
 def parse_args():
-    '''Parse command-line arguments.'''
+    """Parse command-line arguments."""
 
     parser = OptionParser()
     parser.add_option('-p', '--parser',
@@ -106,7 +106,7 @@ def parse_args():
 
 
 def check_config(args):
-    '''Check configuration file.'''
+    """Check configuration file."""
 
     config_file = os.path.join(args.source_dir, '_config.yml')
     with open(config_file, 'r') as reader:
@@ -116,7 +116,7 @@ def check_config(args):
 
 
 def read_all_markdown(args, source_dir):
-    '''Read source files, returning {path : {'metadta':yaml, 'doc':doc}}.'''
+    """Read source files, returning {path : {'metadta':yaml, 'doc':doc}}."""
 
     all_dirs = [os.path.join(source_dir, d) for d in SOURCE_DIRS]
     all_patterns = [os.path.join(d, '*.md') for d in all_dirs]
@@ -130,7 +130,7 @@ def read_all_markdown(args, source_dir):
 
 
 def read_markdown(args, path):
-    '''Get YAML and AST for Markdown file, returning {'metadata':yaml, 'doc':doc}.'''
+    """Get YAML and AST for Markdown file, returning {'metadata':yaml, 'doc':doc}."""
 
     # Split and extract YAML (if present).
     metadata = None
@@ -157,7 +157,7 @@ def read_markdown(args, path):
 
 
 def check_fileset(args, docs):
-    '''Are all required files present? Are extraneous files present?'''
+    """Are all required files present? Are extraneous files present?"""
 
     # Check files with predictable names.
     actual = docs.keys()
@@ -191,7 +191,7 @@ def check_fileset(args, docs):
 
 
 def create_checker(args, filename, info):
-    '''Create appropriate checker for file.'''
+    """Create appropriate checker for file."""
 
     for (pat, cls) in CHECKERS:
         if pat.search(filename):
@@ -199,7 +199,7 @@ def create_checker(args, filename, info):
 
 
 def require(condition, message):
-    '''Fail if condition not met.'''
+    """Fail if condition not met."""
 
     if not condition:
         print(message, file=sys.stderr)
@@ -207,10 +207,10 @@ def require(condition, message):
 
 
 class CheckBase(object):
-    '''Base class for checking Markdown files.'''
+    """Base class for checking Markdown files."""
 
     def __init__(self, args, filename, metadata, metadata_len, doc):
-        '''Cache arguments for checking.'''
+        """Cache arguments for checking."""
 
         super(CheckBase, self).__init__()
         self.args = args
@@ -224,7 +224,7 @@ class CheckBase(object):
 
 
     def check(self):
-        '''Run tests on metadata.'''
+        """Run tests on metadata."""
 
         self.check_metadata()
         self.check_blockquote_classes()
@@ -232,7 +232,7 @@ class CheckBase(object):
 
 
     def check_metadata(self):
-        '''Check the YAML metadata.'''
+        """Check the YAML metadata."""
 
         self.reporter.check(self.metadata is not None,
                             self.filename,
@@ -243,7 +243,7 @@ class CheckBase(object):
 
 
     def check_blockquote_classes(self):
-        '''Check that all blockquotes have known classes.'''
+        """Check that all blockquotes have known classes."""
 
         for node in self.find_all(self.doc, {'type' : 'blockquote'}):
             cls = self.get_val(node, 'attr', 'class')
@@ -254,7 +254,7 @@ class CheckBase(object):
 
 
     def check_codeblock_classes(self):
-        '''Check that all code blocks have known classes.'''
+        """Check that all code blocks have known classes."""
 
         for node in self.find_all(self.doc, {'type' : 'codeblock'}):
             cls = self.get_val(node, 'attr', 'class')
@@ -265,7 +265,7 @@ class CheckBase(object):
 
 
     def find_all(self, node, pattern, accum=None):
-        '''Find all matches for a pattern.'''
+        """Find all matches for a pattern."""
 
         assert type(pattern) == dict, 'Patterns must be dictionaries'
         if accum is None:
@@ -278,7 +278,7 @@ class CheckBase(object):
 
 
     def match(self, node, pattern):
-        '''Does this node match the given pattern?'''
+        """Does this node match the given pattern?"""
 
         for key in pattern:
             if key not in node:
@@ -294,7 +294,7 @@ class CheckBase(object):
 
 
     def get_val(self, node, *chain):
-        '''Get value one or more levels down.'''
+        """Get value one or more levels down."""
 
         curr = node
         for selector in chain:
@@ -305,13 +305,13 @@ class CheckBase(object):
 
 
     def get_loc(self, node):
-        '''Convenience method to get node's line number.'''
+        """Convenience method to get node's line number."""
 
         return self.get_val(node, 'options', 'location') + self.metadata_len
 
 
 class CheckNonJekyll(CheckBase):
-    '''Check a file that isn't translated by Jekyll.'''
+    """Check a file that isn't translated by Jekyll."""
 
     def __init__(self, args, filename, metadata, metadata_len, doc):
         super(CheckNonJekyll, self).__init__(args, filename, metadata, metadata_len, doc)
@@ -324,7 +324,7 @@ class CheckNonJekyll(CheckBase):
 
 
 class CheckIndex(CheckBase):
-    '''Check the main index page.'''
+    """Check the main index page."""
 
     def __init__(self, args, filename, metadata, metadata_len, doc):
         super(CheckIndex, self).__init__(args, filename, metadata, metadata_len, doc)
@@ -332,7 +332,7 @@ class CheckIndex(CheckBase):
 
 
 class CheckEpisode(CheckBase):
-    '''Check an episode page.'''
+    """Check an episode page."""
 
     def __init__(self, args, filename, metadata, metadata_len, doc):
         super(CheckEpisode, self).__init__(args, filename, metadata, metadata_len, doc)
@@ -348,7 +348,7 @@ class CheckEpisode(CheckBase):
 
 
 class CheckReference(CheckBase):
-    '''Check the reference page.'''
+    """Check the reference page."""
 
     def __init__(self, args, filename, metadata, metadata_len, doc):
         super(CheckReference, self).__init__(args, filename, metadata, metadata_len, doc)
@@ -356,7 +356,7 @@ class CheckReference(CheckBase):
 
 
 class CheckGeneric(CheckBase):
-    '''Check a generic page.'''
+    """Check a generic page."""
 
     def __init__(self, args, filename, metadata, metadata_len, doc):
         super(CheckGeneric, self).__init__(args, filename, metadata, metadata_len, doc)
